@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Can be useful for watching things like /tmp
+# TODO: Maybe in the future we could make this a bit more fancy, have
+# dfpercent --watch /tmp.  That would make it easy to incorporate into
+# other tools that watch the output of a command like the xfce genmon.
+
+set -o pipefail
+
+function df_info {
+    df "$1" | tail -n1 | sed 's/ \+/ /g'
+}
+
+function df_percent {
+    (df_info "$1" | cut -d' ' -f5) || echo "?%"
+}
+
+dir=${1:-.}
+
+while true; do
+    echo -n "$dir: $(df_percent "$dir")"
+    echo -n $'\r'
+    sleep 1
+done

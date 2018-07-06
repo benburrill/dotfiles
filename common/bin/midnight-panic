@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+import datetime
+def midnight_tonight():
+    return datetime.datetime.combine(datetime.date.today(),
+                                     datetime.time(23, 59, 59))
+
+def minutes_left():
+    return (midnight_tonight() - datetime.datetime.now()).seconds / 60
+
+def words_per_minute(words):
+    return words / minutes_left()
+
+if __name__ == "__main__":
+    import sys
+    # silliness
+    words = (lambda goal, cur=0: int(goal) - int(cur))(*sys.argv[1:])
+    print(words_per_minute(words))

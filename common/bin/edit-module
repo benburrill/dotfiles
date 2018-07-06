@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# TODO: make this 2/3 compatible for use in virtualenvs, maybe
+# changing the shebang to python, although that would be kinda
+# undesirable on most systems: in virtualenvs, the shebang should be
+# python, otherwise it should be python3 since often the default python
+# is python2.  This is problematic, so I might need/want to make this a
+# shell script to better deal with virtualenvs
+
+import importlib
+import os
+import shlex
+import subprocess
+import sys
+
+def find_file(module_name, path=None):
+    "Guess the origin of module_name from path"
+
+    base, *sub_module = module_name.rsplit(".", 1)
+    if sub_module:
+        path = [os.path.dirname(find_file(base, path))]
+
+    for finder in sys.meta_path:
+        spec = finder.find_spec(module_name, path)
+        if spec and hasattr(spec, "origin"):
+            if not os.path.exists(spec.origin):
+                raise FileNotFoundError(
+                    f"Module '{module_name}' has the origin '{spec.origin}', which is not a file")
+            return spec.origin
+    raise ModuleNotFoundError(
+        f"Cannot find a module named '{module_name}' using sys.meta_path")
+
+# def find_file(name, path=None):
+#     # This seems to ignore the path!
+#     return importlib.util.find_spec(name, path).origin
+
+def editor(default="vi"):
+    return os.environ.get("EDITOR", default)
+
+if __name__ == "__main__":
+    # maybe we should run this in the background?
+    subprocess.run([
+        *shlex.split(editor()),
+        # If you pass it a path, stuff like BuiltinImporter doesn't seem
+        # to work, and if you don't it doesn't know that we want to
+        # search in "" instead of __file__.  Even when it knows to
+        # search in "", PathFinder doesn't really work how I want it
+        # to: it returns "namespace" when there isn't an __init__.py or
+        # something like that.
+        find_file(sys.argv[1], [""] + sys.path[1:])
+    ], check=True)

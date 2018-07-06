@@ -1,0 +1,18 @@
+#!/bin/sh
+# Opens up my vimcrypted notes file with tmux, automatically executing
+# embedded vimscript identified by a unique marker (Yes, it's weird, but
+# at least no one else will ever need to deal with it)
+
+if [ -n "$TMUX" ]
+then
+    vim ~/Documents/encnotes \
+    +'normal ma' \
+    +'/@@unique-marker-96fb9@@' \
+    +'nohl' \
+    +'normal yiB`a@"'\
+    +'let @"=""'
+else
+    # ~requires tmux
+    tmux new-session -s encnotes -A $0 $*
+fi
+

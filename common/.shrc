@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+# ~/.shrc -- Configuration for limited POSIX shells
+# This file is only read by shells that use $ENV for configuration.
+# These are generally very minimalistic shells which I have no intent on
+# ever using as my primary shell.
+# An alternative vision for this file would be configuration common to
+# all shells I use, but I don't want to worry about being compatible
+# with all POSIX shells and also I pretty much only use bash anyway.
+########################################################################
+
+# When bash is invoked as `sh`, it reads from $ENV, but still stores
+# history to the bash history file.  This means that unless my history
+# settings are configured somewhere other then .bashrc, the bash history
+# file will be truncated!  Since I currently want to configure all my
+# history settings in my bashrc (some of them use shopt, and are thus
+# bash-only), I disable history persistence here to avoid truncation.
+unset HISTFILE
+# Be verbose to ensure that no shells read from $ENV that I don't expect
+echo History persistence disabled

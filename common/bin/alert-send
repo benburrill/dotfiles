@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+notify_args=()
+sound=bell
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -\?|--help)
+            echo "Extends notify-send, adding the --sound option"
+            echo "-s, --sound         Play a sound theme using Canberra"
+            echo "See notify-send for more information"
+            exit
+            ;;
+        --sound=*)
+            sound="${1#*=}"
+            ;;
+        -s|--sound)
+            sound="$2"
+            shift
+            ;;
+        --) 
+            notify_args+=("$@")
+            break
+            ;;
+        *) 
+            notify_args+=("$1")
+            ;;
+    esac
+    shift
+done
+
+notify-send "${notify_args[@]}" && canberra-gtk-play --id="$sound"

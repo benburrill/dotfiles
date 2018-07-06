@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+# Inspired by https://gist.github.com/datagrok/2199506
+
+read -r -d '' help << 'END'
+Usage: inve [options] [--] [command] [args]...
+
+  Execute a command in a Python virtual environment.
+
+  If no command is given, $SHELL will be run instead.
+
+  By default, the venv name searched for / created is .venv, but this
+  can be overridden with the --python or --name options.
+
+  Unless --venv, --workon, or --make are passed, inve will search for a
+  venv by walking up the directory tree starting at the current working
+  directory.
+
+  Creation of venvs can be customized in ~/.venv.pip, which is a
+  requirements.txt type file where you can specify packages to be
+  installed in all venvs when created with inve.
+
+Options:
+  --python=<python>    The Python command to use for making the venv.
+                       Also used to determine the venv name.
+                       [default: python3]
+  --name=<name>, -n    The name of the venv to use.  Overrides the venv
+                       name formed by the --python option.
+                       [default: .venv]
+  --venv=<venv>        The venv path.  Overrides the path formed by the
+                       --name option and disables the search for a venv.
+  --workon=<name>, -w  The name of the venv to use in the $WORKON_HOME
+                       directory.  Mutually exclusive with the --name
+                       and --venv options.
+  --make               Make a venv instead of searching for one.  The
+                       venv module is preferred, but inve will fall back
+                       to virtualenv if venv doesn't exist.
+  --help, -h           Show this message and exit.
+END
+
+function fail {
+    echo "$1" >&2
+    exit 1
+}
+
+function test_venv {
+    local venv="$1"
+    [ \
+		-x "$venv/bin/python" \
+        -a -n "$(echo "$venv"/lib/python*/site.py)" \
+        -a -n "$(echo "$venv"/include/python*/Python.h)" \
+    ]
+}
+
+function find_venv {
+    local venv_name="$1"
+    local dir="$2"
+    until test_venv "$dir/$venv_name"; do
+        if [ "$dir" = "/" ]; then
+            return 1
+        fi
+
+        dir="$(dirname "$dir")"
+    done
+
+    echo "$dir/$venv_name"
+}
+
+function make_venv {
+    local python="$1"
+    local venv="$2"
+    
+    if "$python" -m venv -h &> /dev/null; then
+        "$python" -m venv "$venv" || return 1
+    else
+        "$python" -m virtualenv "$venv" || return 1
+    fi
+
+    if [ -e $HOME/.venv.pip ]; then
+        "$venv/bin/pip" install -r $HOME/.venv.pip || return 1
+    fi
+}
+
+function parse_arg {
+    local value="${1#--*=}"
+
+    if [ "$value" != "$1" ]; then
+        echo "$value"
+        return 1
+    else
+        echo "$2"
+        return 2
+    fi
+}
+
+function arg_fail {
+    fail "No value for $_last_opt"
+}
+
+python="python3"
+default_venv_name=".venv"
+
+while [ $# -gt 0 ]; do
+    _last_opt="$1"
+    case "$1" in
+        -h|--help)
+            echo "$help"
+            exit
+            ;;
+        --python|--python=*)
+            python="$(parse_arg "$1" "$2")"; shift $? || arg_fail
+            default_venv_name=".venv-$(basename "$python")"
+            ;;
+        --venv|--venv=*)
+            venv="$(parse_arg "$1" "$2")"; shift $? || arg_fail
+            ;;
+        -n|--name|--name=*)
+            venv_name="$(parse_arg "$1" "$2")"; shift $? || arg_fail
+            ;;
+        -w|--workon|--workon=*)
+            workon_name="$(parse_arg "$1" "$2")"; shift $? || arg_fail
+            ;;
+        --make)
+            make=true
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            fail "Unknown option $1"
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [ -n "$workon_name" ]; then
+    [ -z "$venv$venv_name" ] ||
+        fail "--workon and --venv / --name are mutually exclusive"
+    venv="${WORKON_HOME:-"$HOME/.virtualenvs"}/$workon_name"
+fi
+
+venv_name="${venv_name:-"$default_venv_name"}"
+
+if [ -n "$make" ]; then
+    venv="${venv:-"$PWD/$venv_name"}"
+    make_venv "$python" "$venv" ||
+        fail "Failed to make $python venv at $venv"
+fi
+
+if [ -z "$venv" ]; then
+    venv="$(find_venv "$venv_name" "$PWD")" ||
+        fail "Could not find venv $venv_name"
+fi
+
+test_venv "$venv" ||
+    fail "$(realpath $venv) is not a venv"
+
+# TODO: Maybe do something special (such as nothing) if we're already in
+# a venv?
+export VIRTUAL_ENV="$(realpath "$venv")"
+export PATH="$VIRTUAL_ENV/bin:$PATH"
+unset PYTHON_HOME
+exec -- "${@:-"$SHELL"}"

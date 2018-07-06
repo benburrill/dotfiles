@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Zenity gui for my symlink-gardener tool
+# I add the zengarden commands as file manager actions, which I find
+# results in a very pleasant UX.
+# Mostly I'm just happy with the name though.
+
+# ~requires zenity
+
+# TODO: in the future maybe add more commands, like plant and prune
+# Adding plant would require a file selection window, either to select
+# the package or to select the garden, and I'm not sure which would be
+# better.  Selecting the package makes more sense on principal, but I
+# think I'd prefer to select the garden since I probably would be using
+# it from a file manager to install a specific package.
+
+set -o pipefail
+
+debug="$(mktemp)"
+
+function failed {
+    zenity --error --no-wrap --no-markup \
+           --text="Failed $*.  Log:"$'\n'"$(cat "$debug")"
+    exit 1
+}
+
+function finished {
+    alert-send -i info "Finished $*."
+    exit
+}
+
+action="$1"
+shift
+
+case "$action" in
+    cultivate)
+        echo "Getting packages..." >> "$debug"
+        packages="$(gardener packages 2>> "$debug")" ||
+            failed "to get packages"
+
+        package="$(\
+            echo "$packages" | \
+            zenity --list --text "Add to package..." \
+                   --column "Installed packages" \
+        )" || exit 1
+
+        echo "Selected package $package, cultivating..." >> "$debug"
+
+        gardener cultivate --verbose -p "$package" "$@" &>> "$debug" ||
+            failed "to cultivate files"
+        finished "cultivating $*"
+        ;;
+    fallow)
+        gardener fallow --verbose "$@" &>> "$debug" ||
+            failed "to fallow files"
+        finished "fallow for $*"
+        ;;
+    tend)
+        gardener tend --verbose &>> "$debug" ||
+            failed "to tend garden"
+        finished "tending garden"
+        ;;
+    *)
+        zenity --error --text "Invalid action $action"
+        exit 1
+        ;;
+esac

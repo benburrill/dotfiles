@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Setup script for installing my dotfiles.  Arguments represent names of
+# packages to be installed on top of the base packages (common and -- if
+# private dotfiles are installed -- secrets).  Names that begin with a @
+# represent additional packages from the private dotfiles.
+# Example usage: ./setup xfce
+
+set -o pipefail
+
+dotfiles="$(dirname "${0/#.\//$PWD/}")"
+base_packages=("$dotfiles/common")
+packages=("$@")
+
+function fail {
+    echo "$@" >&2
+    exit 1
+}
+
+# Ensure path is good for installing pipsi / gardener
+export PATH="$HOME/.local/bin:$PATH"
+
+command -v pipsi > /dev/null ||
+    curl https://raw.githubusercontent.com/mitsuhiko/pipsi/master/get-pipsi.py | python3 ||
+    fail "Couldn't install pipsi"
+
+command -v gardener > /dev/null ||
+    pipsi install symlink-gardener ||
+    fail "Couldn't install gardener"
+
+# In case I reorganize things
+[ -x "$dotfiles/common/bin/yn" ] ||
+    fail "Couldn't find yn tool in dotfiles"
+
+if "$dotfiles/common/bin/yn" -n "Install private dotfiles?"; then
+    command -v keybase > /dev/null ||
+        fail "Keybase must be installed for private dotfiles."
+
+    private_dotfiles="$(dirname "$dotfiles")/private-dotfiles"
+
+    [ -d "$private_dotfiles" ] || 
+        git clone keybase://private/benburrill/private-dotfiles "$private_dotfiles" ||
+        fail "Couldn't install private dotfiles, maybe keybase is not set up properly?"
+
+    base_packages+=("$private_dotfiles/secrets")
+
+    # Convert @packages from command line package list to paths to
+    # private package paths.
+    for idx in "${!packages[@]}"; do
+        packages[$idx]="${packages[$idx]/#@/$private_dotfiles/}"
+    done
+fi
+
+# Get paths to packages from command line package list
+for idx in "${!packages[@]}"; do
+    pkg="${packages[$idx]}"
+    [ "${pkg:0:1}" = "/" ] ||
+        packages[$idx]="$dotfiles/$pkg"
+done
+
+packages=("${base_packages[@]}" "${packages[@]}")
+
+# Run per-package setup scripts
+for pkg in "${packages[@]}"; do
+    setup="${pkg%/}.setup"
+    if [ -x "$setup" ]; then
+        "$setup" || fail "Package setup failed for $(basename "$pkg")"
+    fi
+done
+
+! gardener -g "$HOME" prepare &> /dev/null &&
+    "$dotfiles/common/bin/yn" -n "Reset existing garden?" &&
+    gardener -g "$HOME" prepare --verbose --reset ||
+    fail "Couldn't prepare garden"
+
+gardener -g "$HOME" plant --verbose --weeds=compost "${packages[@]}" ||
+    fail "Couldn't plant packages"
+
+echo "Generating $dotfiles/requires.list..."
+find "${packages[@]}" -type f | xargs perl -nle '/~requires (.*)$/ && print $1' | sort | uniq > "$dotfiles/requires.list" ||
+    fail "Couldn't generate list of requirements"

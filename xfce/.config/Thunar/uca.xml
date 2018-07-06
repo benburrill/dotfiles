@@ -1,0 +1,65 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<actions>
+<action>
+	<icon>Terminal</icon>
+	<name>Terminal</name>
+	<unique-id>1367866030392833-1</unique-id>
+	<command>exo-open --working-directory %f --launch TerminalEmulator</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>stock_folder</icon>
+	<name>Thunar Root</name>
+	<unique-id>1367866030392883-2</unique-id>
+	<command>pkexec thunar %f</command>
+	<description>Thunar Root</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>system-search</icon>
+	<name>Search</name>
+	<unique-id>1367866030392913-3</unique-id>
+	<command>catfish %f</command>
+	<description>find files and folders</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>package-upgrade</icon>
+	<name>Cultivate files</name>
+	<unique-id>1530657297595605-1</unique-id>
+	<command>zengarden cultivate %F</command>
+	<description>Cultivate files in a symlink garden</description>
+	<patterns>*</patterns>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>package-downgrade</icon>
+	<name>Fallow files</name>
+	<unique-id>1530657353813267-2</unique-id>
+	<command>zengarden fallow %F</command>
+	<description>Fallow files in a symlink garden</description>
+	<patterns>*</patterns>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>package-reinstall</icon>
+	<name>Tend garden</name>
+	<unique-id>1530658640595760-4</unique-id>
+	<command>zengarden tend</command>
+	<description>Tend symlinks managed by the garden here</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+</actions>

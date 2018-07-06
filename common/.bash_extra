@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# ~requires pythonpy
+which find_pycompletion.sh &> /dev/null && . $(find_pycompletion.sh)

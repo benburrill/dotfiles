@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# ~requires plumbum
+# TODO: I can't really remember why I didn't just make this a shell
+# script, but whatever.
+
+import traceback
+import plumbum
+from plumbum import cli
+
+adb = plumbum.local["adb"]
+mpv = plumbum.local["mpv"]
+netcat = plumbum.local.get("netcat", "nc", "ncat")
+
+class BroadcastApp(cli.Application):
+    use_adb = True
+    host = "127.0.0.1"
+    port = cli.SwitchAttr("--port", str, default="4440")
+
+    @cli.switch("--host", str)
+    def radio_host(self, host):
+        self.use_adb = False
+        self.host = host
+
+    def main(self, *uris):
+        if self.use_adb:
+            # TODO: should we have a context manager for this that does
+            # adb forward --remove tcp:port?
+            adb("forward", f"tcp:{self.port}", f"tcp:{self.port}")
+        
+        return (mpv[(*uris, "--o=-", "--of=mp3", "--no-video")] | 
+                netcat[self.host, self.port]) & plumbum.RETCODE(FG=True)
+
+if __name__ == "__main__":
+    BroadcastApp().run()

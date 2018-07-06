@@ -1,0 +1,8 @@
+$include /etc/inputrc
+# Tab complete symlink directories properly
+set mark-symlinked-directories on
+
+# When scrolling through history, filter by the current position of the
+# cursor
+"\e[A": history-search-backward
+"\e[B": history-search-forward

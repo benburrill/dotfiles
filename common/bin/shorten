@@ -1,0 +1,17 @@
+#!/bin/bash
+# Shorten stdin
+# This is from one of my old bashrcs.  Although I no longer use it, it
+# seems like it might come in handy at some point so I'm keeping it
+# around.
+
+IFS=""
+placeholder="${2:-"[...]"}"
+read -rN "$1" text
+
+if [ -z "$(cat)" ]
+then
+    echo -n "$text"
+else
+    echo -n "${text:0: -${#placeholder}}"
+    echo -n "$placeholder"
+fi

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# remindme in 30 minutes to stop making silly command line tools
+# ~requires at
+
+case "$1" in 
+    --help|-h|how)
+        # 'how' is allowed so the user can do
+        # remindme how to use this thing (or similar)
+        # which I think is cute
+        echo "remindme - simple at-based reminder tool"
+        echo
+        echo "Usage:"
+        echo "    remindme <at|in> timespec [<to|that> reminder]"
+        echo
+        echo "Options:"
+        echo "    timespec is the timespec for at(1); in 'in' mode, it is offset from the present."
+        echo "    reminder is the reminder message to be displayed.  If not given, the reminder will be generated based on timespec."
+        echo "    to and that are simply separators between the time spec and the message.  The choice of wording has no effect."
+        echo
+        echo "Make sure at is installed and the at daemon (atd) is running."
+        exit
+        ;;
+    at) 
+        shift
+        ATARG=""
+        REMINDER="It's $*"
+        ;;
+    in)
+        shift
+        ATARG="now + "
+        REMINDER="$* have passed"
+        ;;
+    *)
+        echo "Must have at or in"
+        exit 1
+        ;;
+esac
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        to|that)
+            shift
+            REMINDER="$*"
+            break
+            ;;
+        *)
+            ATARG="$ATARG $1"
+            shift
+            ;;
+    esac
+done
+
+ALERT="alert-send --icon=alarm Reminder $(printf %q "$REMINDER")"
+at $ATARG <<< "DISPLAY=$(printf %q "$DISPLAY") $ALERT"

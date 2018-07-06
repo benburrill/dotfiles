@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+# The username termux is arbitrary, any username is allowed
+adb forward tcp:8422 tcp:8022 &&
+ssh -i ~/.ssh/rsa/termux.pem -p 8422 termux@localhost

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+PDF=$1
+OUT=${2:-.}
+DIR=$(mktemp -d)
+
+HEADER=$(pdftotext $PDF - | head -n1)
+LESSON=$(echo $HEADER | cut -d' ' -f1)
+TITLE=$(echo $HEADER | cut -d' ' -f2-)
+
+mkdir $DIR/raw
+pdfimages -png $PDF $DIR/raw/fragment
+
+mkdir $DIR/processed
+find $DIR/raw -type f | sort | xargs -n8 | xargs -I{} sh -c "convert -append {} -set filename:f '%f' '$DIR/processed/%[filename:f]'"
+
+mogrify -chop 480x130 "$DIR/processed/*"
+mogrify -gravity SouthEast -chop 480x65 "$DIR/processed/*"
+
+cat > $DIR/output.tex << END
+\documentclass[12pt]{article}
+\usepackage[pdftitle={$TITLE}]{hyperref}
+\usepackage[
+    textwidth=\paperwidth, textheight=\paperheight,
+    hmargin=75pt, vmargin=15pt,
+    includehead, headheight=15pt
+]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{$LESSON}
+\chead{\bfseries{}$TITLE}
+\rhead{Page \thepage}
+
+\begin{document}
+    $(find $DIR/processed -type f -exec echo '\noindent\makebox[\textwidth]{\includegraphics[width=\textwidth]{{}}}' \; | sort)
+\end{document}
+END
+
+pdflatex --output-directory=$DIR $DIR/output.tex
+
+mv $DIR/output.pdf $OUT
+
+rm -rf $DIR

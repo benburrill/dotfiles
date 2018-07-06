@@ -1,0 +1,13 @@
+[user]
+	name = Ben Burrill
+	email = bburrill98@gmail.com
+
+[merge]
+    # ~requires meld
+	tool = meld
+
+[mergetool]
+	keepBackup = false
+
+[hub]
+	protocol = https

@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Workaround improper argument forwarding
+tbb --search $(printf %q "$*")

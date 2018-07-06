@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# TODO: Maybe have a single character mode with read -N1?
+# Maybe the other way around though.  What about just calling the option
+# '+' and if you have it, it lets you input a full line.
+# Or we could just always use read -N1
+
+function usage {
+    echo "Usage: yn [-ynh] [--] prompt"
+    echo "    -y  Sets the default answer to yes"
+    echo "    -n  Sets the default answer to no"
+    echo "    -h  Show this help message"
+    echo
+    echo "Exits with 0 if the user answers yes, 1 if the user answers no,"
+    echo "2 if neither -y nor -n are given and the user's answer is unknown,"
+    echo "3 in the case of invalid arguments"
+}
+
+YES=y
+NO=n
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -y|--yes)
+            YES=Y
+            NO=n
+            shift ;;
+        -n|--no)
+            YES=y
+            NO=N
+            shift ;;
+        -h|--help)
+            usage
+            exit 0 ;;
+        --)
+            shift
+            break ;;
+        -*)
+            echo "Invalid option '$1'"
+            exit 3 ;;
+        *)
+            break ;;
+    esac
+done
+
+if [ $# -eq 1 ]; then
+    PROMPT=$1
+elif [ $# -gt 1 ]; then
+    echo "Too many positional args: $#"
+    exit 3
+else
+    usage
+    exit 3
+fi
+
+read -r -p "$PROMPT [$YES/$NO] " answer
+
+case "$answer" in
+    y*|Y*) exit 0 ;;
+    n*|N*) exit 1 ;;
+    *)
+        [ $YES = Y ] && exit 0
+        [ $NO = N ] && exit 1
+        echo "Invalid answer '$answer'"
+        exit 2 ;;
+esac

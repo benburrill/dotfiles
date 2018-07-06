@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+if [ "$#" = "0" ]
+then
+    text="$(cat)"
+else
+    text="$*"
+fi
+
+# TODO: In any terminals that don't support this and print visible
+# cruft, don't do anything (or do something different if the terminal
+# offers an alternative way to set the title)
+# However, I can't find any such terminal; it works well in tmux
+# (incorporated into the tmux title rather than overwriting it), and it
+# even "works" in the linux console (doesn't output any cruft).
+echo -ne "\e]2;$text\a"
