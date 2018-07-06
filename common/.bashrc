@@ -1,8 +1,8 @@
 [[ -r "/usr/share/bash-completion/bash_completion" ]] &&
-    . "/usr/share/bash-completion/bash_completion"
+    . "/usr/share/bash-completion/bash_completion" || :
 
 [[ -r "$HOME/.prompt" ]] &&
-    . "$HOME/.prompt"
+    . "$HOME/.prompt" || :
 
 
 # Pretty colors
@@ -133,4 +133,4 @@ PS2='\[$PROMPT_BASE_STYLE$PROMPT_USER_STYLE\]>\[$PROMPT_BASE_STYLE\] '
 
 # Platform-specific .bashrc
 [[ -r "$HOME/.bashrc.plat" ]] &&
-    . "$HOME/.bashrc.plat"
+    . "$HOME/.bashrc.plat" || :

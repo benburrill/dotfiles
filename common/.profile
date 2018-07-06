@@ -19,4 +19,4 @@ export PYTHONSTARTUP="$HOME/lib/python-startup-loader.py"
 
 # Platform-specific .profile
 [[ -r "$HOME/.profile.plat" ]] &&
-    . "$HOME/.profile.plat"
+    . "$HOME/.profile.plat" || :
