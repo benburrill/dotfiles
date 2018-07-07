@@ -24,7 +24,7 @@ command -v pipsi > /dev/null ||
     fail "Couldn't install pipsi"
 
 command -v gardener > /dev/null ||
-    pipsi install symlink-gardener ||
+    pipsi install --python=python3 symlink-gardener ||
     fail "Couldn't install gardener"
 
 # In case I reorganize things
