@@ -18,7 +18,7 @@ Installation
 ------------
 
 The setup script depends on ``bash``, ``coreutils``, ``python>=3.6``,
-``perl``, and ``wget``.
+``perl``, and ``curl``.
 
 The setup script installs the base dotfile packages (common and
 optionally secrets) in addition to any platform-specific package passed
