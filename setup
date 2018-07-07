@@ -67,7 +67,7 @@ for pkg in "${packages[@]}"; do
     fi
 done
 
-! gardener -g "$HOME" prepare &> /dev/null &&
+gardener -g "$HOME" prepare &> /dev/null ||
     "$dotfiles/common/bin/yn" -n "Reset existing garden?" &&
     gardener -g "$HOME" prepare --verbose --reset ||
     fail "Couldn't prepare garden"
