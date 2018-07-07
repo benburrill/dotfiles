@@ -11,9 +11,22 @@ dotfiles="$(dirname "${0/#.\//$PWD/}")"
 base_packages=("$dotfiles/common")
 packages=("$@")
 
+if ! command -v tput > /dev/null; then
+    alias tput=:
+fi
+
 function fail {
+    tput setaf 1 >&2
     echo "$@" >&2
+    tput sgr0 >&2
     exit 1
+}
+
+function info {
+    tput bold
+    tput setaf 6
+    echo "$@"
+    tput sgr0
 }
 
 # Ensure path is good for installing pipsi / gardener
@@ -63,9 +76,12 @@ packages=("${base_packages[@]}" "${packages[@]}")
 for pkg in "${packages[@]}"; do
     setup="${pkg%/}.setup"
     if [ -x "$setup" ]; then
-        "$setup" || fail "Package setup failed for $(basename "$pkg")"
+        info "Setting up package $(basename "$pkg")..."
+        "$setup" || fail "$(basename "$setup") failed"
     fi
 done
+
+info "Installing packages..."
 
 gardener -g "$HOME" prepare &> /dev/null ||
     "$dotfiles/common/bin/yn" -n "Reset existing garden?" &&
@@ -75,6 +91,6 @@ gardener -g "$HOME" prepare &> /dev/null ||
 gardener -g "$HOME" plant --verbose --weeds=compost "${packages[@]}" ||
     fail "Couldn't plant packages"
 
-echo "Generating $dotfiles/requires.list..."
+info "Generating $dotfiles/requires.list..."
 find "${packages[@]}" -type f | xargs perl -nle '/~requires (.*)$/ && print $1' | sort | uniq > "$dotfiles/requires.list" ||
     fail "Couldn't generate list of requirements"
