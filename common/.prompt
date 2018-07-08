@@ -123,10 +123,10 @@ function no_prompt_style {
 function status_info {
     # Outputs a string representing the current status.  Optionally
     # takes an argument that indicates the currently running command.
-    # status_info is mostly used to determine what the terminal title
-    # should be set to, but may also be embedded into the prompt if
-    # desired.
+    # status_info is mostly (if not exclusively) used to determine what
+    # the terminal title should be set to.
 
+    [ -n "$SSH_CONNECTION" ] && echo -n "ssh: "
     # Use all the arguments just in case
     [ -n "$*" ] && echo -n "($*) "
     echo -n "${PWD/#$HOME/\~}"
