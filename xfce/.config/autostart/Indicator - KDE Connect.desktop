@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=0.9.4
+Type=Application
+Name=Indicator - KDE Connect
+Comment=Start indicator-kdeconnect
+# ~requires indicator-kdeconnect
+Exec=indicator-kdeconnect
+OnlyShowIn=XFCE;
+StartupNotify=false
+Terminal=false
+Hidden=false
+

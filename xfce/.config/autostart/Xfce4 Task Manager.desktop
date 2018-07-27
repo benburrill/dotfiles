@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=0.9.4
+Type=Application
+Name=Xfce4 Task Manager
+Comment=Start the task manager hidden
+# ~requires xfce4-taskmanager>=1.2.1
+Exec=xfce4-taskmanager --start-hidden
+OnlyShowIn=XFCE;
+StartupNotify=false
+Terminal=false
+Hidden=false
+
