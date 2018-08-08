@@ -45,7 +45,7 @@ function fail {
 function test_venv {
     local venv="$1"
     [ \
-		-x "$venv/bin/python" \
+        -x "$venv/bin/python" \
         -a -n "$(echo "$venv"/lib/python*/site.py)" \
         -a -n "$(echo "$venv"/include/python*/Python.h)" \
     ]
