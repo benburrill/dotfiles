@@ -37,7 +37,7 @@ class _QuitOnDisplay(object):
     def __call__(self, code=None):
         _sys.exit(code)
 
-    def _display_hook_(self):
+    def _displayhook_(self):
         self(0)
 
 
@@ -47,75 +47,58 @@ exit = quit = _QuitOnDisplay()
 # --- Stuff to make _QuitOnDisplay actually work ---
 
 
-class _ReprWrapper(object):
-    "Tongue twister"
-    def __init__(self, string):
-        self.string = string
-
-    def __repr__(self):
-        return self.string
+_last_displayhook = _default_displayhook = _sys.__displayhook__
 
 
-_last_display_hook = _default_display_hook = _sys.__displayhook__
+def _new_displayhook(value):
+    if hasattr(value, "_displayhook_"):
+        value._displayhook_()
+        _builtins._ = value
+    else:
+        _last_displayhook(value)
 
 
-def _new_display_hook(value):
-    actual_value = value
-    if hasattr(value, "_display_hook_"):
-        to_display = value._display_hook_()
-
-        if to_display is not None:
-            value = _ReprWrapper(to_display)
-
-    _last_display_hook(value)
-
-    # If value was a _ReprWrapper, _ will be incorrect, so set it to the
-    # actual value.
-    _builtins._ = actual_value
-
-
-def use_overloadable_display_hook(make_default=0):
+def use_overloadable_displayhook(make_default=0):
     """
     Use a display hook that can be overloaded with the method
-    _display_hook_(self) -> str.  
+    _displayhook_(self) -> str.  
     
     If ``make_default`` is True, ``sys.__displayhook__`` will also be
     set, making it less likely for another display hook modifier to
     remove overloading.  If this happens anyway, re-calling
-    ``use_overloadable_display_hook`` will make the other program's
+    ``use_overloadable_displayhook`` will make the other program's
     display hook compatible with overloading.
 
-    The string that ``_display_hook_`` methods return is displayed.  If
-    ``None`` is returned, the object will be displayed normally.
-    ``_display_hook_`` methods need not worry about dealing with the
-    ``_`` variable.
+    ``_displayhook_`` methods need not worry about dealing with the
+    ``_`` variable, but are otherwise responsible for everything else
+    ``sys.displayhook`` does.
     """
     
-    global _last_display_hook
+    global _last_displayhook
     
     # Never update the last display hook to the overloadable display
     # hook because it is used to restore to the time before the
     # overloadable display hook was used.
-    if _sys.displayhook is not _new_display_hook:
-        _last_display_hook = _sys.displayhook
-        _sys.displayhook = _new_display_hook
+    if _sys.displayhook is not _new_displayhook:
+        _last_displayhook = _sys.displayhook
+        _sys.displayhook = _new_displayhook
 
     if make_default:
-        _sys.__displayhook__ = _new_display_hook
+        _sys.__displayhook__ = _new_displayhook
 
 
-def reset_display_hooks():
+def reset_displayhooks():
     """
     Reset ``sys.__displayhook__`` to what it was before %s was loaded
     and ``sys.displayhook`` to what it was before the overloadable
     display hook was used.
     """
 
-    _sys.displayhook = _last_display_hook
-    _sys.__displayhook__ = _default_display_hook
+    _sys.displayhook = _last_displayhook
+    _sys.__displayhook__ = _default_displayhook
 
-reset_display_hooks.__doc__ %= __file__
+reset_displayhooks.__doc__ %= __file__
 
 
 # Update the display hook 
-use_overloadable_display_hook(0)
+use_overloadable_displayhook(0)
