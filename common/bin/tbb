@@ -2,4 +2,4 @@
 # ~requires ~/.local/share/tbb
 
 cd ~/.local/share/tbb/
-./start-tor-browser.desktop $*
+./start-tor-browser.desktop "$@"

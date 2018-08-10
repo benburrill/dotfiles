@@ -1,4 +1,4 @@
 #!/bin/sh
 # ~requires scratch.vim
 # (Should I put scratch.vim in my .vim/bundle?)
-vim +Scratch +only +"set number" %*
+vim +Scratch +only +"set number" "$@"

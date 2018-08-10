@@ -13,6 +13,6 @@ then
     +'let @"=""'
 else
     # ~requires tmux
-    tmux new-session -s encnotes -A $0 $*
+    tmux new-session -s encnotes -A $0 "$@"
 fi
 
