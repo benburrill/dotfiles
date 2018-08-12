@@ -20,10 +20,10 @@ Installation
 The setup script depends on ``bash``, ``coreutils``, ``python>=3.6``,
 ``perl``, and ``curl``.
 
-The setup script installs the base dotfile packages (common and
-optionally secrets) in addition to any platform-specific package passed
-as a command line argument.  So setting up dotfiles for a platform that
-uses xfce would look like this:
+The setup script installs the "common" dotfile package (and optionally
+its private dotfiles counterpart) in addition to any platform-specific
+package passed as a command line argument.  So setting up dotfiles for a
+platform that uses xfce would look like this:
 
 .. code:: shell
 

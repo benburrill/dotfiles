@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-# Setup script for installing my dotfiles.  Arguments represent names of
-# packages to be installed on top of the base packages (common and -- if
-# private dotfiles are installed -- secrets).  Names that begin with a @
-# represent additional packages from the private dotfiles.
+# Setup script for installing my dotfiles.  Arguments represent package
+# names to install over the base "common" package(s)
 # Example usage: ./setup xfce
 
 set -o pipefail
 
 dotfiles="$(dirname "${0/#.\//$PWD/}")"
-base_packages=("$dotfiles/common")
-packages=("$@")
+package_names=("common" "$@")
+repos=("$dotfiles")
 
 if ! command -v tput > /dev/null; then
     alias tput=:
@@ -54,34 +52,31 @@ if "$dotfiles/common/bin/yn" -n "Install private dotfiles?"; then
         git clone keybase://private/benburrill/private-dotfiles "$private_dotfiles" ||
         fail "Couldn't install private dotfiles, maybe keybase is not set up properly?"
 
-    base_packages+=("$private_dotfiles/secrets")
-
-    # Convert @packages from command line package list to paths to
-    # private package paths.
-    for idx in "${!packages[@]}"; do
-        packages[$idx]="${packages[$idx]/#@/$private_dotfiles/}"
-    done
+    repos+=("$private_dotfiles")
 fi
 
-# Get paths to packages from command line package list
-for idx in "${!packages[@]}"; do
-    pkg="${packages[$idx]}"
-    [ "${pkg:0:1}" = "/" ] ||
-        packages[$idx]="$dotfiles/$pkg"
+packages=()
+package_paths=()
+for name in "${package_names[@]}"; do
+    name="${name%/}"
+    for repo in "${repos[@]}"; do
+        garden_name="$(basename "$repo")/$name"
+
+        if [ -d "$repo/$name" ]; then
+            packages+=("$garden_name:$repo/$name")
+            package_paths+=("$repo/$name")
+        fi
+
+        # This is separate from the directory check so setup scripts can
+        # run even if they don't come with an actual garden package.
+        if [ -x "$repo/$name.setup" ]; then
+            info "Setting up package $garden_name..."
+            "$repo/$name.setup" || fail "$garden_name.setup failed"
+        fi
+    done
 done
 
-packages=("${base_packages[@]}" "${packages[@]}")
-
-# Run per-package setup scripts
-for pkg in "${packages[@]}"; do
-    setup="${pkg%/}.setup"
-    if [ -x "$setup" ]; then
-        info "Setting up package $(basename "$pkg")..."
-        "$setup" || fail "$(basename "$setup") failed"
-    fi
-done
-
-info "Installing packages..."
+info "Installing ${#packages[@]} packages..."
 
 gardener -g "$HOME" prepare &> /dev/null ||
     "$dotfiles/common/bin/yn" -n "Reset existing garden?" &&
@@ -92,5 +87,7 @@ gardener -g "$HOME" plant --verbose --weeds=compost "${packages[@]}" ||
     fail "Couldn't plant packages"
 
 info "Generating $dotfiles/requires.list..."
-find "${packages[@]}" -type f | xargs perl -nle '/~requires (.*)$/ && print $1' | sort | uniq > "$dotfiles/requires.list" ||
+find "${package_paths[@]}" -type f -print0 |
+    xargs -0 perl -nle '/~requires (.*)$/ && print $1' |
+    sort | uniq > "$dotfiles/requires.list" ||
     fail "Couldn't generate list of requirements"
