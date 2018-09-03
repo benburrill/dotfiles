@@ -1,5 +1,5 @@
 #!/bin/sh
-# ~requires ~/.local/share/tbb
+# ~requires ~/.local/opt/tbb
 
-cd ~/.local/share/tbb/
+cd ~/.local/opt/tbb/
 ./start-tor-browser.desktop "$@"
