@@ -1,3 +1,5 @@
 #!/usr/bin/env sh
+[ "$EUID" = 0 ] || exec sudo "$0" "$@"
+
 swapoff -a
 swapon -a
