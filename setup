@@ -30,8 +30,11 @@ function info {
 # Ensure path is good for installing pipsi / gardener
 export PATH="$HOME/.local/bin:$PATH"
 
+# The PyPI release of pipsi is super out of date and uses virtualenv rather
+# than venv, but master is broken, so for now we use my fork.
 command -v pipsi > /dev/null ||
-    curl https://raw.githubusercontent.com/mitsuhiko/pipsi/master/get-pipsi.py | python3 ||
+    curl https://raw.githubusercontent.com/benburrill/pipsi/master/get-pipsi.py |
+    python3 - --src "git+https://github.com/benburrill/pipsi.git#egg=pipsi" ||
     fail "Couldn't install pipsi"
 
 command -v gardener > /dev/null ||
