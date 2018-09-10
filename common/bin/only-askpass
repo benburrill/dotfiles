@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+# Git uses $SSH_ASKPASS for both usernames and passwords.  In KDE, this
+# means popping open a window with a password field asking me for a
+# username, which is annoying and confusing.  Since there doesn't seem
+# to be any git-kwallet integration apart from through $SSH_ASKPASS, I
+# do want to use askpass, just not for usernames.  This script fails
+# with a non-zero status when the prompt contains "Username" or if
+# $SSH_ASKPASS isn't set, which causes git to fallback to prompting
+# through the terminal.  It also causes an error message to appear,
+# which isn't ideal, but otherwise I would need to re-implement
+# git_terminal_prompt, but with more limited information about whether
+# git _actually_ wants to echo.
+
+case "$1" in Username*)
+    exit 1
+esac
+
+[ -n "$SSH_ASKPASS" ] && exec "$SSH_ASKPASS" "$@"

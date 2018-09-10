@@ -17,6 +17,11 @@ export EDITOR=vim
 
 export PYTHONSTARTUP="$HOME/lib/python-startup-loader.py"
 
+# Only use only-askpass if $SSH_ASKPASS is defined so that we can avoid
+# excessive "unable to read askpass response" errors.
+[[ -n "$SSH_ASKPASS" ]] &&
+    export GIT_ASKPASS="only-askpass"
+
 # Platform-specific .profile
 [[ -r "$HOME/.profile.plat" ]] &&
     . "$HOME/.profile.plat" || :
