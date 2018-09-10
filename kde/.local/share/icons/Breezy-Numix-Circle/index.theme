@@ -1,0 +1,10 @@
+[Icon Theme]
+Name=Breezy Numix Circle
+Comment=Numix icon theme with circular apps icons design which falls back to the Breeze theme for missing icons
+
+Inherits=Numix-Circle,breeze
+
+Directories=dummy
+
+[dummy]
+Size=16

@@ -1,0 +1,20 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+X-KDE-Submenu=Symlink Gardener
+Actions=cultivate;fallow;
+MimeType=all/all;
+
+[Desktop Action cultivate]
+Name=Cultivate selected files
+Comment=Cultivate files in a symlink garden
+TryExec=zengarden
+Exec=zengarden cultivate %F
+Icon=package-upgrade
+
+[Desktop Action fallow]
+Name=Fallow selected files
+Comment=Fallow files in a symlink garden
+TryExec=zengarden
+Exec=zengarden fallow %F
+Icon=package-downgrade
