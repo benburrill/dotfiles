@@ -118,16 +118,16 @@ function no_prompt_style {
     PROMPT_PATH_STYLE=
 }
 
-# TODO: I probably want to trim off whitespace from the end of command
-# since often tab completion results in an extra space at the end.
 function status_info {
     # Outputs a string representing the current status.  Optionally
     # takes an argument that indicates the currently running command.
     # status_info is mostly (if not exclusively) used to determine what
     # the terminal title should be set to.
 
-    [ -n "$SSH_CONNECTION" ] && echo -n "ssh: "
     # Use all the arguments just in case
-    [ -n "$*" ] && echo -n "($*) "
+    local cmd="$(echo -n "$*" | sed 's/[[:space:]]*$//')"
+
+    [ -n "$SSH_CONNECTION" ] && echo -n "ssh: "
+    [ -n "$cmd" ] && echo -n "($cmd) "
     echo -n "${PWD/#$HOME/\~}"
 }
