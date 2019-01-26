@@ -4,6 +4,7 @@
 if adb forward tcp:8422 tcp:8022; then
     # The username termux is arbitrary, any username is allowed
     ssh -i ~/.ssh/rsa/termux.pem -p 8422 termux@localhost
+    adb forward --remove tcp:8422
 else
     echo "Make sure that:"
     echo " * ADB / android-tools are installed"
