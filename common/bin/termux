@@ -1,5 +1,13 @@
 #!/usr/bin/env sh
 
-# The username termux is arbitrary, any username is allowed
-adb forward tcp:8422 tcp:8022 &&
-ssh -i ~/.ssh/rsa/termux.pem -p 8422 termux@localhost
+# ~requires android-tools
+if adb forward tcp:8422 tcp:8022; then
+    # The username termux is arbitrary, any username is allowed
+    ssh -i ~/.ssh/rsa/termux.pem -p 8422 termux@localhost
+else
+    echo "Make sure that:"
+    echo " * ADB / android-tools are installed"
+    echo " * Phone is plugged in"
+    echo " * USB connection is set to PTP mode"
+    echo " * USB debugging is enabled"
+fi
