@@ -131,6 +131,8 @@ PS1='\[$(status_info | title)\]\[$PROMPT_BASE_STYLE\]'\
 '\[$PROMPT_USER_STYLE\]$PROMPT_JOBS\$\[$PROMPT_BASE_STYLE\] '
 PS2='\[$PROMPT_BASE_STYLE$PROMPT_USER_STYLE\]>\[$PROMPT_BASE_STYLE\] '
 
-# Platform-specific .bashrc
-[[ -r "$HOME/.bashrc.plat" ]] &&
-    . "$HOME/.bashrc.plat" || :
+# Run platform-specific bashrcs
+for script in "$HOME/.local/etc/bashrc.d"/*; do
+    [[ -r "$script" ]] &&
+        . "$script" || :
+done

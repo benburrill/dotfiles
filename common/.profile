@@ -22,6 +22,8 @@ export PYTHONSTARTUP="$HOME/lib/python-startup-loader.py"
 [[ -n "$SSH_ASKPASS" ]] &&
     export GIT_ASKPASS="only-askpass"
 
-# Platform-specific .profile
-[[ -r "$HOME/.profile.plat" ]] &&
-    . "$HOME/.profile.plat" || :
+# Run platform-specific profile scripts
+for script in "$HOME/.local/etc/profile.d"/*; do
+    [[ -r "$script" ]] &&
+        . "$script" || :
+done
