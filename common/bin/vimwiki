@@ -1,11 +1,5 @@
 #!/bin/bash
 # ~requires vimwiki
 
-goto_arg=""
 wiki_page="$*"
-if [ -n "$wiki_page" ]; then
-    # VimwikiGoto requires spaces to be escaped
-    goto_arg="+VimwikiGoto ${wiki_page// /\\ }"
-fi
-
-vim +VimwikiIndex "$goto_arg"
+vim +VimwikiIndex ${wiki_page:+"+VimwikiGoto ${wiki_page// /\\ }"}
