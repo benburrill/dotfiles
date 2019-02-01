@@ -98,10 +98,9 @@ alias tra='tree -a'
 alias extra='. ~/.bash_extra'
 
 
-# Store unlimited history in ram and persist a lot of it.  When changing
-# history options, think about potential effects on the prompt/title.
-HISTSIZE=-1
-HISTFILESIZE=100000
+# When changing these history options, think about potential effects on the
+# prompt/title.
+HISTSIZE=100000
 HISTCONTROL=ignoredups
 shopt -s histappend
 shopt -s cmdhist
