@@ -17,4 +17,4 @@ file="$(basename "$1")"
 
 # TODO: race condition... should I care?
 [ -e "$path/$file" ] ||
-    grep -F -m1 "$path/$file" <(arrivals "$path") > /dev/null
+    grep -Fx -m1 "$path/$file" <(arrivals "$path") > /dev/null
