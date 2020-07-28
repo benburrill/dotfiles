@@ -74,6 +74,24 @@ for name in "${package_names[@]}"; do
         # run even if they don't come with an actual garden package.
         if [ -x "$repo/$name.setup" ]; then
             info "Setting up package $garden_name..."
+
+            # TODO: I think it would be nice if setup scripts could set
+            # dependencies.  IDK the best way to do this, maybe they
+            # could output "dep: blah" or something.  Maybe I could use
+            # process substitution to pass a file descriptor.  Maybe I
+            # could export a bash function (actually I don't think that
+            # would work -- probably wouldn't be able to update global
+            # variables.  Could source the setup scripts, but I don't
+            # really want to TBH).  But in any case, I probably want to
+            # make the contents of this loop into a function and add
+            # dependencies as needed to the packages list.  Also, since
+            # it would be annoying to have to update the package_names
+            # array, that should probably be created on the fly in the
+            # loop rather than stored as a variable to make sure it
+            # doesn't get misused.  But also, there's the possibility of
+            # duplicate packages, which we'll need to be wary of.  So
+            # I'll probably want to create a package_names array, just
+            # it might be different from the inputted package names.
             "$repo/$name.setup" || fail "$garden_name.setup failed"
         fi
     done

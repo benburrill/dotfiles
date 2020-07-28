@@ -10,6 +10,8 @@ export LD_LIBRARY_PATH="$HOME/.local/lib:$LD_LIBRARY_PATH"
 
 export HOSTALIASES="$HOME/.local/etc/hosts"
 
+export ANDROID_SDK_ROOT="$HOME/.local/lib/Android/Sdk"
+
 # TODO: let's decide on these based on availability: vim, nano, vi
 # ~requires vim
 export VISUAL=vim

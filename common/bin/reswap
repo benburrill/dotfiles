@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 [ "$EUID" = 0 ] || exec sudo "$0" "$@"
 
+echo "Disabling swap..."
 swapoff -a
+echo "Re-enabling swap..."
 swapon -a

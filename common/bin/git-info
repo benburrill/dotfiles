@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# The idea with this is to output a bunch of info about the current git
+# repo.  Kinda like git status, but less focused on the status of the
+# working tree and more on how the git repo is configured / whatever.
+
+if origin="$(git config --get remote.origin.url)"; then
+    echo "Remote origin: $origin"
+else
+    echo "No remote origin."
+fi
+
+if hash="$(git rev-parse --short HEAD)"; then
+    echo "HEAD at $hash"
+fi

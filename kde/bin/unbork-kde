@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd
+plasmashell --replace & disown
+kwin --replace & disown

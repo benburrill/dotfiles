@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Useful for tools like libinput-gestures
+# I have the following in my ~/.config/libinput-gestures.conf:
+# gesture swipe up kde-desktop-grid on
+# gesture swipe down kde-desktop-grid off
+
+# TODO: add ~/.config/libinput-gestures.conf to the dotfiles, but I'll
+# want to clean it up a bit first, maybe make it not kde-specific?
+
+if qdbus org.kde.KWin /Effects activeEffects | grep -q '^desktopgrid$'
+then
+    current_status=on
+else
+    current_status=off
+fi
+
+case "$1" in on|off|toggle) ;; *)
+    echo "Usage: kde-desktop-grid [on|off|toggle]" >&2
+    exit 1
+    ;;
+esac
+
+if [ "$1" != "$current_status" ]
+then
+    qdbus org.kde.kglobalaccel /component/kwin org.kde.kglobalaccel.Component.invokeShortcut ShowDesktopGrid > /dev/null &&
+    echo "Desktop grid toggled"
+else
+    echo "Desktop grid already $current_status"
+fi

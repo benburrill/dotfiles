@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Wait until a file exists.
+
+function arrivals {
+    if command -v inotifywait; then
+        inotifywait -q -m --format "$1/%f" -e create -e moved_to "$1"
+    else
+        fswatch --event=Created --event=MovedTo --event=Renamed "$1"
+    fi
+}
+
+# TODO: in theory it shouldn't be too difficult to make this work even
+# if the parent directory doesn't exist, just wait for the parent to
+# exist then wait for the child, and so on.
+path="$(realpath "$(dirname "$1")")" || exit 1
+file="$(basename "$1")"
+
+# TODO: race condition... should I care?
+[ -e "$path/$file" ] ||
+    grep -F -m1 "$path/$file" <(arrivals "$path") > /dev/null

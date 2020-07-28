@@ -3,9 +3,11 @@
 # embedded vimscript identified by a unique marker (Yes, it's weird, but
 # at least no one else will ever need to deal with it)
 
-if [ -n "$TMUX" ]
+case "$0" in */gencnotes) g=g;; esac
+
+if [ -n "$g$TMUX" ]
 then
-    vim ~/Documents/encnotes \
+    ${g}vim ~/Documents/encnotes \
     +'normal ma' \
     +'/@@unique-marker-96fb9@@' \
     +'nohl' \

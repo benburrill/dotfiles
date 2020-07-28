@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+CACHE="$CACHE_DIR/firefox-show"
+
+function run_disowned {
+    "$@" >& /dev/null &
+    disown "$!"
+}
+
+if [ ! -d "$CACHE" ]; then
+    mkdir -p "$CACHE_DIR"
+    cp --dereference --recursive "$HOME/lib/firefox-show" "$CACHE"
+fi
+
+# For some reason, -profile doesn't work if there's an open firefox
+# window unless you ALSO pass a profile name with -p.  You can also get
+# around this with -no-remote, but that just introduces more problems.
+# The name shouldn't belong to a profile that's already running though,
+# so I just use the path of the profile as the name, which should be
+# sufficiently unique as to not be in use by another profile.
+run_disowned firefox -p "$CACHE" -profile "$CACHE" -new-window "$@"

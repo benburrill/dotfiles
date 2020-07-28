@@ -1,4 +1,6 @@
 #!/bin/sh
 # ~requires scratch.vim
-# (Should I put scratch.vim in my .vim/bundle?)
-vim +Scratch +only +"set number" "$@"
+# TODO: I should probably put scratch.vim in my .vim/bundle
+
+case "$0" in */gscratch) g=g;; esac
+${g}vim +Scratch +only +"set number" "$@"

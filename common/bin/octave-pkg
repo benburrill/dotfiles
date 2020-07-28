@@ -1,0 +1,55 @@
+#!/usr/bin/env octave
+% CLI for Octave's pkg command, but with nicer behavior.
+% ~requires octave
+
+
+args = argv();
+
+
+% Get prefixes from env and use a saner prefix by default.
+% Don't do this for root though, because then you're presumably trying
+% to do global package management, and having a user prefix breaks that.
+if getuid() != 0
+    prefix     = getenv("OCTAVE_PKG_PREFIX");
+    archprefix = getenv("OCTAVE_PKG_ARCHPREFIX");
+
+    if isempty(prefix)
+        prefix = "~/.local/lib/octave";
+    end
+
+    if isempty(archprefix)
+        archprefix = prefix;
+    end
+
+    if !isempty(archprefix)
+        pkg("prefix", prefix, archprefix);
+    end
+end
+
+
+switch {args{:}, ""}{1}
+    case "install"
+        pkg("install", "-forge", args{2:end});
+    case "raw-install"
+        pkg("install", args{2:end});
+    case "help"
+        printf([
+            "The 'octave-pkg' script wraps the 'pkg' function.\n" ...
+            "It differs from the function in the following ways:\n" ...
+            "    * The 'install' command uses forge by default.\n" ...
+            "    * The 'raw-install' command has been added.\n" ...
+            "      It does what the 'install' command used to do.\n" ...
+            "    * The user prefix is no longer ~/octave.\n" ...
+            "      It is instead ~/.local/lib/octave by default.\n" ...
+            "      This can be changed with $OCTAVE_PKG_PREFIX.\n" ...
+            "\n" ...
+            "To read help for the 'pkg' function, run\n" ...
+            "    $ octave-pkg help-pkg\n"
+        ]);
+    case "help-pkg"
+        help pkg;
+    otherwise
+        pkg(args{:});
+end
+
+% vim: ft=matlab

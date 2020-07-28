@@ -23,6 +23,40 @@ except ImportError:
 
 try:
     from pydoc import pager
-    less = more = pager
+
+    try:
+        from StringIO import StringIO as _StringIO
+    except ImportError:
+        from io import StringIO as _StringIO
+
+    import sys as _sys
+
+    class _PagerCtx(object):
+        def __init__(self, pfunc):
+            self.buffer = None
+            self.old_stdout = None
+            self.pfunc = pfunc
+
+        def __enter__(self):
+            if self.old_stdout is not None:
+                raise RuntimeError("Nested pagers")
+
+            self.buffer = _StringIO()
+            self.old_stdout = _sys.stdout
+            _sys.stdout = self.buffer
+
+        def __exit__(self, t_exc, exc, tb):
+            _sys.stdout = self.old_stdout
+            self.old_stdout = None
+
+            text = self.buffer.getvalue()
+            self.buffer = None
+
+            self(text)
+
+        def __call__(self, text):
+            self.pfunc(text)
+
+    less = more = pager = _PagerCtx(pager)
 except ImportError:
     pass

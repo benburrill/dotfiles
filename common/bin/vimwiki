@@ -1,5 +1,7 @@
 #!/bin/bash
 # ~requires vimwiki
 
+case "$0" in */gvimwiki) g=g;; esac
+
 wiki_page="$*"
-vim +VimwikiIndex ${wiki_page:+"+VimwikiGoto ${wiki_page// /\\ }"}
+${g}vim +VimwikiIndex ${wiki_page:+"+VimwikiGoto ${wiki_page// /\\ }"}

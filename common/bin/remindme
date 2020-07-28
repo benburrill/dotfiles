@@ -2,7 +2,7 @@
 # remindme in 30 minutes to stop making silly command line tools
 # ~requires at
 
-case "$1" in 
+case "$1" in
     --help|-h|how)
         # 'how' is allowed so the user can do
         # remindme how to use this thing (or similar)
@@ -20,7 +20,7 @@ case "$1" in
         echo "Make sure at is installed and the at daemon (atd) is running."
         exit
         ;;
-    at) 
+    at)
         shift
         ATARG=""
         REMINDER="It's $*"

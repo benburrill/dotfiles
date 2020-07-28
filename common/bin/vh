@@ -1,2 +1,3 @@
 #!/bin/sh
-vim +"help $1" +"only"
+case "$0" in */gvh) g=g;; esac
+${g}vim +"help $1" +"only"

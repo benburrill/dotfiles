@@ -98,8 +98,11 @@ alias tra='tree -a'
 alias extra='. ~/.bash_extra'
 
 
-# When changing these history options, think about potential effects on the
-# prompt/title.
+# When changing these history options, think about potential effects on
+# the prompt/title.  For example, on a couple of occasions, I have tried
+# changing HISTCONTROL to ignoreboth.  However, by suppressing commands
+# starting with a space from history, this breaks the title and the last
+# status prompt when such commands are used.  So be careful!
 HISTSIZE=100000
 HISTCONTROL=ignoredups
 shopt -s histappend

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# ~requires jq
+
+# TODO: looks like desktop-file-install/desktop-file-edit would do this
+# better.
+
+# This is used for all icons, svg or not.  However, the jetbrains icons
+# are all svg so it doesn't really matter.
+ICON_DEST=~/.local/share/icons/hicolor/scalable/apps
+
+for entry in ~/.local/share/applications/jetbrains-*.desktop; do
+    updated="$(mktemp)"
+    while read line; do
+        case "$line" in
+            Icon=*)
+                oldicon="${line#Icon=}"
+                appdir="$(dirname "$oldicon")"
+                if [ -f "$appdir/product-info.json" ]; then
+                    img="$(jq -r ".svgIconPath" "$appdir/product-info.json")"
+                    src="$appdir/$img"
+                    dest="$(basename "$src")"
+                else
+                    src="$oldicon"
+                    img="$(basename "$src")"
+                    dest="${img/*./$(basename "$entry" .desktop).}"
+                fi
+
+                mkdir -p "$ICON_DEST" && cp -f "$src" "$ICON_DEST/$dest"
+                echo "Icon=${dest%.*}"
+                ;;
+            *)
+                echo "$line"
+                ;;
+        esac
+    done < "$entry" > "$updated"
+    mv -f "$updated" "$entry"
+done
