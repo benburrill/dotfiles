@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# vim move: behaves like mv, but also copies over any vim files in
+# ~/.local/share/vim/{backup,swap,undo}
+# If you're copying this script from my dotfiles, you need to configure
+# vim to store its backup, swap and undo there.  See my .vim/vimrc for
+# how (currently it's in https://github.com/benburrill/.vim)
+
+function move_vim_files {
+    local src="$(realpath -m -- "$1")"
+    local dest="$(realpath -- "$2")"
+
+    for dir in "$HOME/.local/share/vim"/{backup,swap,undo}; do
+        local v_src="$dir/${src//\//%}"
+        local v_dest="$dir/${dest//\//%}"
+
+        if [[ -d "$dest" ]]; then
+            compgen -G "$v_src%*" > /dev/null &&
+            for file in "$v_src"%*; do
+                mv $verbose -- "$file" "$v_dest${file#$v_src}"
+            done; :
+        elif [[ -e "$v_src" ]]; then
+            mv $verbose -- "$v_src" "$v_dest"
+        fi
+    done
+}
+
+export -f move_vim_files
+
+function onmove {
+    case "$1" in
+        removed) return ;;
+        renamed|copied)
+            if [[ "$3" = '->' && ( -z "$5" || "$5" = '(backup:' ) && "$#" -le 6 ]]; then
+                [[ -n "$5" ]] && move_vim_files "$4" "${6%)}"
+                move_vim_files "$2" "$4"
+                return
+            fi
+            ;;
+        *)  ;;
+    esac
+    echo "vmv: unexpected verbose output: $*, vim files unmoved" >&2
+}
+
+export -f onmove
+
+# TODO: add --virtual move option that only moves the vim files?
+export verbose=''
+for arg; do case "$arg" in
+    --verbose|-v*|-[!-]*v*) export verbose='-v' ;;
+    --help|--version) exec -a vmv mv "$arg" ;;
+    --) break ;;
+esac; done
+
+mv -vi "$@" | while read -r line; do
+    [[ -n "$verbose" ]] && echo "$line"
+
+    # xargs understands quotes, but unlike eval in bash, doesn't treat
+    # parentheses specially.
+    echo "$line" | xargs bash -c 'onmove "$@"' --
+done

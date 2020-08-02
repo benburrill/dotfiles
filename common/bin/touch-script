@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+file="$1"
+interp="$2"
+[ ! -e "$file" ] && echo "#!/usr/bin/env ${interp:-bash}" > "$file"
+chmod +x "$file"
