@@ -1,8 +1,8 @@
 [[ -r "/usr/share/bash-completion/bash_completion" ]] &&
     . "/usr/share/bash-completion/bash_completion" || :
 
-[[ -r "$HOME/.prompt" ]] &&
-    . "$HOME/.prompt" || :
+[[ -r "$HOME/lib/prompt.sh" ]] &&
+    . "$HOME/lib/prompt.sh" || :
 
 
 # Pretty colors

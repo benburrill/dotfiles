@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Ultimately, my hope for this file is for it to define prompt
 # components that can be used with multiple shells.  Currently, I am
 # assuming bash though since that's all I use, but probably most if not
