@@ -38,7 +38,7 @@ function onmove {
             ;;
         *)  ;;
     esac
-    echo "vmv: unexpected verbose output: $*, vim files unmoved" >&2
+    echo "vmv: ignoring unexpected verbose output: $*" >&2
 }
 
 export -f onmove
