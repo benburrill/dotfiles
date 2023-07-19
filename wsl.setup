@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+curl -L https://raw.githubusercontent.com/rupor-github/wsl-ssh-agent/88dba0ec95c4124012831cf81e35c35e19c72748/docs/wsl-ssh-agent-relay --create-dirs -o "$HOME/.local/bin/wsl-ssh-agent-relay" || exit 1
+echo "9e711bbc871dfcdeed0f008b829bfcb934df89489663f16b1b0e0c1fe98b2673  $HOME/.local/bin/wsl-ssh-agent-relay" | sha256sum --quiet --check || exit 1
+chmod +x "$HOME/.local/bin/wsl-ssh-agent-relay"
+
+
+WIN_HOME="$(wslpath "$(cd /mnt/c && cmd.exe /C 'echo %USERPROFILE%' | tr -d '\r')")"
+ln -s "$WIN_HOME" ~/winhome
+
+curl -L https://github.com/jstarks/npiperelay/releases/download/v0.1.0/npiperelay_windows_amd64.zip -o /tmp/npiperelay_windows_amd64.zip || exit 1
+echo '6b9ef61ffd17c03507a9a3d54d815dceb3dae669ac67fc3bf4225d1e764ce5f6  /tmp/npiperelay_windows_amd64.zip' | sha256sum --quiet --check || exit 1
+
+NPIPE_DIR="$(mktemp -d)"
+unzip /tmp/npiperelay_windows_amd64.zip -d "$NPIPE_DIR" && mkdir -p ~/winhome/.wsl && mv "$NPIPE_DIR/npiperelay.exe" ~/winhome/.wsl
+rm /tmp/npiperelay_windows_amd64.zip
+rm -rf "$NPIPE_DIR"
