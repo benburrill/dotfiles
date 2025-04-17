@@ -7,9 +7,6 @@ I manage my dotfiles with `symlink-gardener`_, which is a tool I made
 because I was unhappy with existing tools that people use for dotfile
 management (like GNU stow).
 
-I use keybase's encrypted git repo hosting to store my private dotfiles
-(which contain things like passwords).
-
 Currently, my vim configuration is in a separate repo (see
 https://github.com/benburrill/.vim).  Eventually, I would like to
 transfer it here while preserving the version history.
